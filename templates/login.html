@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login com Face ID</title>
+</head>
+<body>
+    <h1>Login Facial</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="post" action="/login">
+        <button type="submit">Fazer login com o rosto</button>
+    </form>
+    <a href="/register">Registre-se</a>
+</body>
+</html>
