@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar rosto</title>
+</head>
+<body>
+    <h1>Registrar novo usuário</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="/register">
+        <label for="name">Nome do usuário:</label>
+        <input type="text" name="name" required>
+        <button type="submit">Capturar e Registrar</button>
+    </form>
+    <br>
+    <a href="/">Voltar para login</a>
+</body>
+</html>
