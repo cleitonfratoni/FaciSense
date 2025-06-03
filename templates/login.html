@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Login com Face ID</title>
 </head>
 <body>
+  <div class="main-container">
     <h1>Login Facial</h1>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -14,9 +16,14 @@
         </ul>
       {% endif %}
     {% endwith %}
-    <form method="post" action="/login">
+    <div class="form-buttons">
+      <form method="post" action="/login" class="form">
         <button type="submit">Fazer login com o rosto</button>
-    </form>
-    <a href="/register">Registre-se</a>
+      </form>
+      <a href="/register">
+        <button type="button">Registre-se</button>
+      </a>
+    </div>
+  </div>
 </body>
 </html>

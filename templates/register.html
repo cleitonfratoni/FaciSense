@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="../static/js/script.js"></script>
     <title>Registrar rosto</title>
 </head>
 <body>
+  <div class="main-container">
     <h1>Registrar novo usuário</h1>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -14,12 +17,18 @@
         </ul>
       {% endif %}
     {% endwith %}
-    <form method="POST" action="/register">
-        <label for="name">Nome do usuário:</label>
-        <input type="text" name="name" required>
-        <button type="submit">Capturar e Registrar</button>
-    </form>
+    <div>
+      <form method="POST" action="/register" id="registerForm">
+        <label class="label-form" for="name">Nome do usuário:</label>
+        <input class="input-form" type="text" name="name" required>
+        <button type="button" onclick="startCountdown()">Capturar e Registrar</button>
+      </form>
+      <p id="countdown"></p>
+    </div>
     <br>
-    <a href="/">Voltar para login</a>
+    <a href="/">
+      <button type="button">Voltar para login</button>
+    </a>
+  </div>
 </body>
 </html>

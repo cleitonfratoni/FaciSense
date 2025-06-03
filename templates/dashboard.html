@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="../static/js/script.js"></script>
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="main-container">
+        <h2>Bem-vindo, {{ user }}!</h2>
+
+        <div class="content-row">
+            <img class="img-square" src="{{ url_for('static', filename='face_db/' ~ user ~ '.jpg') }}">
+
+            <div class="game-container">
+                <h2>🎯 Clique na Bolinha!</h2>
+                <p>Pontuação: <span id="score">0</span></p>
+                <div id="game-area"></div>
+            </div>
+        </div>
+
+        <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+        <br>
+        <a href="/">
+            <button type="button">Sair</button>
+        </a>
+    </div>
+</body>
+</html>
+
