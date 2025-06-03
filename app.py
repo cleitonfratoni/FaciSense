@@ -2,11 +2,22 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import face_recognition
 import cv2
 import os
+import numpy as np
+import time
 
 app = Flask(__name__)
 app.secret_key = "secret"
 
-FACE_DB_PATH = "face_db"
+FACE_DB_PATH = "static/face_db"
+
+if not os.path.exists(FACE_DB_PATH):
+    os.makedirs(FACE_DB_PATH)
+
+def capture_frame():
+    cap = cv2.VideoCapture(0)
+    ret, frame = cap.read()
+    cap.release()
+    return ret, frame
 
 def load_known_faces():
     known_encodings = []
@@ -27,10 +38,7 @@ def index():
 
 @app.route('/login', methods=['POST'])
 def login():
-    video_capture = cv2.VideoCapture(0)
-    ret, frame = video_capture.read()
-    video_capture.release()
-
+    ret, frame = capture_frame()
     if not ret:
         flash("Erro ao acessar a câmera.")
         return redirect(url_for('index'))
@@ -44,14 +52,24 @@ def login():
         flash("Nenhum rosto detectado.")
         return redirect(url_for('index'))
 
-    match = face_recognition.compare_faces(known_encodings, faces[0])
-    if True in match:
-        name = known_names[match.index(True)]
+    distances = face_recognition.face_distance(known_encodings, faces[0])
+    if len(distances) == 0:
+        flash("Nenhum rosto conhecido encontrado.")
+        return redirect(url_for('index'))
+
+    min_distance_index = np.argmin(distances)
+    if distances[min_distance_index] < 0.5:
+        name = known_names[min_distance_index]
         flash(f"Login bem-sucedido. Bem-vindo, {name}!")
+        return redirect(url_for('dashboard', user=name))
     else:
         flash("Rosto não reconhecido.")
+        return redirect(url_for('index'))
 
-    return redirect(url_for('index'))
+@app.route('/dashboard')
+def dashboard():
+    user = request.args.get('user', 'usuário')
+    return render_template('dashboard.html', user=user)
 
 # NOVA ROTA: Página de registro
 @app.route('/register', methods=['GET', 'POST'])
@@ -62,30 +80,45 @@ def register():
             flash("Nome inválido.")
             return redirect(url_for('register'))
 
-        # Captura imagem da webcam
-        video_capture = cv2.VideoCapture(0)
-        ret, frame = video_capture.read()
-        video_capture.release()
+        image_path = os.path.join(FACE_DB_PATH, f"{name}.jpg")
 
+        # Evita duplicação por nome
+        if os.path.exists(image_path):
+            flash("Este nome já está registrado.")
+            return redirect(url_for('register'))
+
+        # Captura imagem com countdown
+        ret, frame = capture_frame()
         if not ret:
             flash("Erro ao acessar a câmera.")
             return redirect(url_for('register'))
 
-        # Detecta rostos
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        face_locations = face_recognition.face_locations(rgb_frame)
+        new_face_encodings = face_recognition.face_encodings(rgb_frame)
 
-        if len(face_locations) != 1:
+        if len(new_face_encodings) != 1:
             flash("Por favor, certifique-se de que apenas UM rosto está visível.")
             return redirect(url_for('register'))
 
-        # Salva imagem com o nome
-        save_path = os.path.join(FACE_DB_PATH, f"{name}.jpg")
-        cv2.imwrite(save_path, frame)
+        new_encoding = new_face_encodings[0]
+
+        # Verifica duplicação por rosto
+        for filename in os.listdir(FACE_DB_PATH):
+            known_image_path = os.path.join(FACE_DB_PATH, filename)
+            known_image = face_recognition.load_image_file(known_image_path)
+            known_encodings = face_recognition.face_encodings(known_image)
+
+            if known_encodings and face_recognition.compare_faces([known_encodings[0]], new_encoding, tolerance=0.5)[0]:
+                flash("Este rosto já está registrado com outro nome.")
+                return redirect(url_for('register'))
+
+        # Salva a imagem se não houver duplicação
+        cv2.imwrite(image_path, frame)
         flash(f"Usuário {name} registrado com sucesso.")
         return redirect(url_for('index'))
 
     return render_template('register.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
