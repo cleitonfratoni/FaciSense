@@ -97,8 +97,8 @@ Acesse via navegador: [http://localhost:5000](http://localhost:5000)
 
 ## 🧑‍💻 Autores
 
-Feito com 💻 por [Cleiton Fratoni](https://github.com/cleitonfratoni)
-Feito com 💻 por [Matheus Gomes](https://github.com/mathgoms02)
+- Feito com 💻 por [Cleiton Fratoni](https://github.com/cleitonfratoni)
+- Feito com 💻 por [Matheus Gomes](https://github.com/mathgoms02)
 
 ---
 
